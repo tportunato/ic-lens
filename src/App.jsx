@@ -1960,7 +1960,7 @@ export default function ICLens() {
           <img
             src="https://res.cloudinary.com/dsgfts9gp/image/upload/Gemini_Generated_Image_uao02uao02uao02u-remove-bg-io_mb5sys.png"
             alt=""
-            style={{ height: "42px", width: "42px", objectFit: "contain", flexShrink: 0 }}
+            style={{ height: "50px", width: "50px", objectFit: "contain", flexShrink: 0 }}
           />
           <div style={{ width: "0.5px", height: "18px", background: "rgba(255,255,255,0.15)", flexShrink: 0 }} />
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
