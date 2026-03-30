@@ -836,15 +836,15 @@ function Inp({ value, onChange, type = "text", placeholder, min, max, step, styl
   return (
     <input type={type} value={value ?? ""} onChange={(e) => onChange(type === "number" ? (e.target.value === "" ? "" : parseFloat(e.target.value)) : e.target.value)}
       placeholder={placeholder} min={min} max={max} step={step}
-      style={{ width: "100%", background: "#F7F5F1", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "6px 10px", fontSize: "12px", color: "#0F2744", fontFamily: "'DM Sans', sans-serif", outline: "none", boxSizing: "border-box", ...style }}
-      onFocus={(e) => (e.target.style.borderColor = "#C8692A")} onBlur={(e) => (e.target.style.borderColor = "#E8E5DE")} />
+      style={{ width: "100%", background: "#ffffff", border: "1px solid #D8D4CC", borderRadius: "8px", padding: "6px 10px", fontSize: "12px", color: "#0F2744", fontFamily: "'DM Sans', sans-serif", outline: "none", boxSizing: "border-box", ...style }}
+      onFocus={(e) => (e.target.style.borderColor = "#C8692A")} onBlur={(e) => (e.target.style.borderColor = "#D8D4CC")} />
   );
 }
 
 function Sel({ value, onChange, options }) {
   return (
     <select value={value ?? ""} onChange={(e) => onChange(e.target.value)}
-      style={{ width: "100%", background: "#F7F5F1", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "6px 10px", fontSize: "12px", color: "#0F2744", fontFamily: "'DM Sans', sans-serif", outline: "none", boxSizing: "border-box", cursor: "pointer", appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center", paddingRight: "28px" }}>
+      style={{ width: "100%", background: "#ffffff", border: "1px solid #D8D4CC", borderRadius: "8px", padding: "6px 10px", fontSize: "12px", color: "#0F2744", fontFamily: "'DM Sans', sans-serif", outline: "none", boxSizing: "border-box", cursor: "pointer", appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center", paddingRight: "28px" }}>
       <option value="">Select…</option>
       {options.map((o) => <option key={o} value={o}>{o}</option>)}
     </select>
@@ -865,103 +865,120 @@ function DealForm({ deal, onUpdate }) {
   const flaggedMetrics = { exitMultiple: deal.exitMultiple > 15, exitCagr: deal.exitCagr > 30, netDebtEbitda: deal.netDebtEbitda > 7 };
   const u = (key) => (val) => onUpdate({ ...deal, [key]: val });
 
+  const card = { background: "#ffffff", border: "0.5px solid #E8E5DE", borderRadius: "10px", padding: "20px 20px 6px 20px", marginBottom: "16px" };
+
   return (
     <div style={{ padding: "0 2px" }}>
-      <SecHeader number="A" label="Deal Identity" />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
-        <Field label="Deal Name"><Inp value={deal.name} onChange={u("name")} placeholder="e.g. Alpine Consumer Brands" /></Field>
-        <Field label="Currency"><Sel value={deal.currency} onChange={u("currency")} options={CURRENCIES} /></Field>
-        <Field label="Sector"><Sel value={deal.sector} onChange={u("sector")} options={SECTORS} /></Field>
-        <Field label="Geography"><Sel value={deal.geography} onChange={u("geography")} options={GEOGRAPHIES} /></Field>
-        <Field label="Vintage Year"><Inp value={deal.vintage} onChange={u("vintage")} type="number" placeholder="2024" min={2010} max={2030} /></Field>
-        <Field label="Holding Period (years)"><Inp value={deal.holdingPeriod} onChange={u("holdingPeriod")} type="number" placeholder="5" min={1} max={15} step={0.5} /></Field>
-      </div>
-      <Field label="Investment Thesis / Notes">
-        <textarea value={deal.notes ?? ""} onChange={(e) => onUpdate({ ...deal, notes: e.target.value })} rows={2}
-          style={{ width: "100%", background: "#f8fafc", border: "0.5px solid #e2e8f0", borderRadius: "4px", padding: "6px 9px", fontSize: "12px", color: "#0f172a", fontFamily: "'IBM Plex Sans', sans-serif", resize: "vertical", outline: "none", boxSizing: "border-box" }} />
-      </Field>
-      <Field label="Fragility Flag" hint="The single variable that, if wrong, breaks the return case">
-        <Inp value={deal.fragility} onChange={u("fragility")} placeholder="e.g. Exit Multiple, Revenue CAGR, EBITDA Margin…" />
-      </Field>
-
-      <SecHeader number="1" label="Entry Valuation" />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
-        <Field label="Enterprise Value (€m)"><Inp value={deal.ev} onChange={u("ev")} type="number" min={0} /></Field>
-        <Field label="Entry EBITDA (€m)"><Inp value={deal.ebitda} onChange={u("ebitda")} type="number" min={0} step={0.1} /></Field>
-        <Field label="Entry Revenue (€m)"><Inp value={deal.revenue} onChange={u("revenue")} type="number" min={0} step={0.1} /></Field>
-        <Field label="EV/EBITDA (entry)"><Inp value={deal.evEbitda} onChange={u("evEbitda")} type="number" min={0} step={0.1} /></Field>
-        <Field label="EV/Revenue (entry)"><Inp value={deal.evRevenue} onChange={u("evRevenue")} type="number" min={0} step={0.01} /></Field>
-        <Field label="Sector Median EV/EBITDA"><Inp value={deal.sectorMedianEvEbitda} onChange={u("sectorMedianEvEbitda")} type="number" min={0} step={0.1} /></Field>
+      <div style={card}>
+        <SecHeader number="A" label="Deal Identity" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
+          <Field label="Deal Name"><Inp value={deal.name} onChange={u("name")} placeholder="e.g. Alpine Consumer Brands" /></Field>
+          <Field label="Currency"><Sel value={deal.currency} onChange={u("currency")} options={CURRENCIES} /></Field>
+          <Field label="Sector"><Sel value={deal.sector} onChange={u("sector")} options={SECTORS} /></Field>
+          <Field label="Geography"><Sel value={deal.geography} onChange={u("geography")} options={GEOGRAPHIES} /></Field>
+          <Field label="Vintage Year"><Inp value={deal.vintage} onChange={u("vintage")} type="number" placeholder="2024" min={2010} max={2030} /></Field>
+          <Field label="Holding Period (years)"><Inp value={deal.holdingPeriod} onChange={u("holdingPeriod")} type="number" placeholder="5" min={1} max={15} step={0.5} /></Field>
+        </div>
+        <Field label="Investment Thesis / Notes">
+          <textarea value={deal.notes ?? ""} onChange={(e) => onUpdate({ ...deal, notes: e.target.value })} rows={2}
+            style={{ width: "100%", background: "#ffffff", border: "1px solid #D8D4CC", borderRadius: "8px", padding: "6px 9px", fontSize: "12px", color: "#0F2744", fontFamily: "'DM Sans', sans-serif", resize: "vertical", outline: "none", boxSizing: "border-box" }}
+            onFocus={(e) => (e.target.style.borderColor = "#C8692A")} onBlur={(e) => (e.target.style.borderColor = "#D8D4CC")} />
+        </Field>
+        <Field label="Fragility Flag" hint="The single variable that, if wrong, breaks the return case">
+          <Inp value={deal.fragility} onChange={u("fragility")} placeholder="e.g. Exit Multiple, Revenue CAGR, EBITDA Margin…" />
+        </Field>
       </div>
 
-      <SecHeader number="2" label="Return Profile" />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
-        <Field label="Target IRR (%)"><Inp value={deal.irr} onChange={u("irr")} type="number" min={0} max={100} step={0.1} /></Field>
-        <Field label="MOIC (×)"><Inp value={deal.moic} onChange={u("moic")} type="number" min={0} step={0.1} /></Field>
-        <Field label="Payback Period (yrs)"><Inp value={deal.payback} onChange={u("payback")} type="number" min={0} step={0.1} /></Field>
-      </div>
-      <div style={{ background: "#f0f4f8", border: "0.5px solid #cbd5e1", borderRadius: "6px", padding: "12px 14px", marginBottom: "14px" }}>
-        <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#475569", textTransform: "uppercase", marginBottom: "10px" }}>Return Attribution — MOIC Waterfall (× contribution)</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "0 12px" }}>
-          {[["Entry Price Effect","attr_entryPrice"],["Revenue Growth","attr_revenueGrowth"],["Margin Expansion","attr_marginExpansion"],["Multiple Expansion","attr_multipleExpansion"],["Leverage Paydown","attr_leveragePaydown"]].map(([label, key]) => (
-            <Field key={key} label={label}><Inp value={deal[key]} onChange={u(key)} type="number" placeholder="0.00" min={-2} max={5} step={0.01} /></Field>
-          ))}
+      <div style={card}>
+        <SecHeader number="1" label="Entry Valuation" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
+          <Field label="Enterprise Value (€m)"><Inp value={deal.ev} onChange={u("ev")} type="number" min={0} /></Field>
+          <Field label="Entry EBITDA (€m)"><Inp value={deal.ebitda} onChange={u("ebitda")} type="number" min={0} step={0.1} /></Field>
+          <Field label="Entry Revenue (€m)"><Inp value={deal.revenue} onChange={u("revenue")} type="number" min={0} step={0.1} /></Field>
+          <Field label="EV/EBITDA (entry)"><Inp value={deal.evEbitda} onChange={u("evEbitda")} type="number" min={0} step={0.1} /></Field>
+          <Field label="EV/Revenue (entry)"><Inp value={deal.evRevenue} onChange={u("evRevenue")} type="number" min={0} step={0.01} /></Field>
+          <Field label="Sector Median EV/EBITDA"><Inp value={deal.sectorMedianEvEbitda} onChange={u("sectorMedianEvEbitda")} type="number" min={0} step={0.1} /></Field>
         </div>
       </div>
 
-      <SecHeader number="3" label="Leverage & Capital Structure" />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
-        <Field label="Net Debt (€m)"><Inp value={deal.netDebt} onChange={u("netDebt")} type="number" min={0} /></Field>
-        <Field label="Net Debt / EBITDA" flag={flaggedMetrics.netDebtEbitda}>
-          <Inp value={deal.netDebtEbitda} onChange={u("netDebtEbitda")} type="number" min={0} step={0.1} style={flaggedMetrics.netDebtEbitda ? { borderColor: "#ef4444" } : {}} />
-        </Field>
-        <Field label="Interest Coverage (×)"><Inp value={deal.interestCoverage} onChange={u("interestCoverage")} type="number" min={0} step={0.1} /></Field>
-        <Field label="Debt Type"><Sel value={deal.debtType} onChange={u("debtType")} options={DEBT_TYPES} /></Field>
-        <Field label="Covenant Headroom (%)"><Inp value={deal.covenantProximity} onChange={u("covenantProximity")} type="number" min={0} max={100} /></Field>
-        <Field label="Refinancing Risk"><Sel value={deal.refinancingRisk} onChange={u("refinancingRisk")} options={REFINANCING_RISKS} /></Field>
-      </div>
-
-      <SecHeader number="4" label="Revenue & Margin Assumptions" />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
-        <Field label="Revenue CAGR — Exit (%)" flag={flaggedMetrics.exitCagr}>
-          <Inp value={deal.exitCagr} onChange={u("exitCagr")} type="number" min={-20} max={100} step={0.1} style={flaggedMetrics.exitCagr ? { borderColor: "#ef4444" } : {}} />
-        </Field>
-        <Field label="EBITDA Margin — Entry (%)"><Inp value={deal.ebitdaMarginEntry} onChange={u("ebitdaMarginEntry")} type="number" min={0} max={100} step={0.1} /></Field>
-        <Field label="EBITDA Margin — Exit (%)"><Inp value={deal.ebitdaMarginExit} onChange={u("ebitdaMarginExit")} type="number" min={0} max={100} step={0.1} /></Field>
-        <Field label="Organic Growth Split (%)"><Inp value={deal.organicGrowthSplit} onChange={u("organicGrowthSplit")} type="number" min={0} max={100} step={5} /></Field>
-        <Field label="Assumption Score (override)" hint="Auto-calculated if blank">
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <Inp value={deal.assumptionScore} onChange={u("assumptionScore")} type="number" min={0} max={10} step={0.1} />
-            <div style={{ padding: "4px 10px", borderRadius: "4px", fontWeight: 700, fontSize: "12px", background: scoreColor(deal.assumptionScore ?? score) + "20", color: scoreColor(deal.assumptionScore ?? score), border: `1px solid ${scoreColor(deal.assumptionScore ?? score)}40`, whiteSpace: "nowrap", fontFamily: "monospace" }}>
-              {deal.assumptionScore ?? score} / 10
-            </div>
+      <div style={card}>
+        <SecHeader number="2" label="Return Profile" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
+          <Field label="Target IRR (%)"><Inp value={deal.irr} onChange={u("irr")} type="number" min={0} max={100} step={0.1} /></Field>
+          <Field label="MOIC (×)"><Inp value={deal.moic} onChange={u("moic")} type="number" min={0} step={0.1} /></Field>
+          <Field label="Payback Period (yrs)"><Inp value={deal.payback} onChange={u("payback")} type="number" min={0} step={0.1} /></Field>
+        </div>
+        <div style={{ background: "#F7F5F1", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "12px 14px", marginBottom: "14px" }}>
+          <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#888888", textTransform: "uppercase", marginBottom: "10px" }}>Return Attribution — MOIC Waterfall (× contribution)</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "0 12px" }}>
+            {[["Entry Price Effect","attr_entryPrice"],["Revenue Growth","attr_revenueGrowth"],["Margin Expansion","attr_marginExpansion"],["Multiple Expansion","attr_multipleExpansion"],["Leverage Paydown","attr_leveragePaydown"]].map(([label, key]) => (
+              <Field key={key} label={label}><Inp value={deal[key]} onChange={u(key)} type="number" placeholder="0.00" min={-2} max={5} step={0.01} /></Field>
+            ))}
           </div>
-        </Field>
+        </div>
       </div>
 
-      <SecHeader number="5" label="Exit Assumptions" />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "0 16px" }}>
-        <Field label="Exit Multiple (×)" flag={flaggedMetrics.exitMultiple}>
-          <Inp value={deal.exitMultiple} onChange={u("exitMultiple")} type="number" min={0} max={50} step={0.5} style={flaggedMetrics.exitMultiple ? { borderColor: "#ef4444" } : {}} />
-        </Field>
-        <Field label="+1× Sensitivity"><Inp value={deal.exitMultipleSensPlus} onChange={u("exitMultipleSensPlus")} type="number" min={0} step={0.5} /></Field>
-        <Field label="-1× Sensitivity"><Inp value={deal.exitMultipleSensMinus} onChange={u("exitMultipleSensMinus")} type="number" min={0} step={0.5} /></Field>
-        <Field label="Exit Route"><Sel value={deal.exitRoute} onChange={u("exitRoute")} options={EXIT_ROUTES} /></Field>
-        <Field label="Exit EBITDA (€m)"><Inp value={deal.exitEbitda} onChange={u("exitEbitda")} type="number" min={0} /></Field>
+      <div style={card}>
+        <SecHeader number="3" label="Leverage & Capital Structure" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
+          <Field label="Net Debt (€m)"><Inp value={deal.netDebt} onChange={u("netDebt")} type="number" min={0} /></Field>
+          <Field label="Net Debt / EBITDA" flag={flaggedMetrics.netDebtEbitda}>
+            <Inp value={deal.netDebtEbitda} onChange={u("netDebtEbitda")} type="number" min={0} step={0.1} style={flaggedMetrics.netDebtEbitda ? { borderColor: "#ef4444" } : {}} />
+          </Field>
+          <Field label="Interest Coverage (×)"><Inp value={deal.interestCoverage} onChange={u("interestCoverage")} type="number" min={0} step={0.1} /></Field>
+          <Field label="Debt Type"><Sel value={deal.debtType} onChange={u("debtType")} options={DEBT_TYPES} /></Field>
+          <Field label="Covenant Headroom (%)"><Inp value={deal.covenantProximity} onChange={u("covenantProximity")} type="number" min={0} max={100} /></Field>
+          <Field label="Refinancing Risk"><Sel value={deal.refinancingRisk} onChange={u("refinancingRisk")} options={REFINANCING_RISKS} /></Field>
+        </div>
       </div>
-      <Field label="Implied Exit EV (€m)"><Inp value={deal.impliedExitEv} onChange={u("impliedExitEv")} type="number" min={0} /></Field>
 
-      <SecHeader number="6" label="Management & Sponsor Quality" />
-      <div style={{ background: "#f0f4f8", border: "0.5px solid #cbd5e1", borderRadius: "6px", padding: "12px 14px", marginBottom: "14px" }}>
-        <div style={{ fontSize: "10px", color: "#64748b", marginBottom: "10px" }}>Score each dimension 1–10.</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0 16px" }}>
-          {[["Track Record","mgmtTrackRecord"],["Skin in Game","mgmtSkinInGame"],["Sponsor Quality","sponsorQuality"],["Alignment","alignment"]].map(([label, key]) => (
-            <Field key={key} label={label} hint={`${deal[key] ?? "—"} / 10`}>
-              <input type="range" min={1} max={10} step={1} value={deal[key] ?? 5}
-                onChange={(e) => onUpdate({ ...deal, [key]: parseInt(e.target.value) })}
-                style={{ width: "100%", accentColor: "#1e3a5f", cursor: "pointer" }} />
-            </Field>
-          ))}
+      <div style={card}>
+        <SecHeader number="4" label="Revenue & Margin Assumptions" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
+          <Field label="Revenue CAGR — Exit (%)" flag={flaggedMetrics.exitCagr}>
+            <Inp value={deal.exitCagr} onChange={u("exitCagr")} type="number" min={-20} max={100} step={0.1} style={flaggedMetrics.exitCagr ? { borderColor: "#ef4444" } : {}} />
+          </Field>
+          <Field label="EBITDA Margin — Entry (%)"><Inp value={deal.ebitdaMarginEntry} onChange={u("ebitdaMarginEntry")} type="number" min={0} max={100} step={0.1} /></Field>
+          <Field label="EBITDA Margin — Exit (%)"><Inp value={deal.ebitdaMarginExit} onChange={u("ebitdaMarginExit")} type="number" min={0} max={100} step={0.1} /></Field>
+          <Field label="Organic Growth Split (%)"><Inp value={deal.organicGrowthSplit} onChange={u("organicGrowthSplit")} type="number" min={0} max={100} step={5} /></Field>
+          <Field label="Assumption Score (override)" hint="Auto-calculated if blank">
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <Inp value={deal.assumptionScore} onChange={u("assumptionScore")} type="number" min={0} max={10} step={0.1} />
+              <div style={{ padding: "4px 10px", borderRadius: "4px", fontWeight: 700, fontSize: "12px", background: scoreColor(deal.assumptionScore ?? score) + "20", color: scoreColor(deal.assumptionScore ?? score), border: `1px solid ${scoreColor(deal.assumptionScore ?? score)}40`, whiteSpace: "nowrap", fontFamily: "monospace" }}>
+                {deal.assumptionScore ?? score} / 10
+              </div>
+            </div>
+          </Field>
+        </div>
+      </div>
+
+      <div style={card}>
+        <SecHeader number="5" label="Exit Assumptions" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "0 16px" }}>
+          <Field label="Exit Multiple (×)" flag={flaggedMetrics.exitMultiple}>
+            <Inp value={deal.exitMultiple} onChange={u("exitMultiple")} type="number" min={0} max={50} step={0.5} style={flaggedMetrics.exitMultiple ? { borderColor: "#ef4444" } : {}} />
+          </Field>
+          <Field label="+1× Sensitivity"><Inp value={deal.exitMultipleSensPlus} onChange={u("exitMultipleSensPlus")} type="number" min={0} step={0.5} /></Field>
+          <Field label="-1× Sensitivity"><Inp value={deal.exitMultipleSensMinus} onChange={u("exitMultipleSensMinus")} type="number" min={0} step={0.5} /></Field>
+          <Field label="Exit Route"><Sel value={deal.exitRoute} onChange={u("exitRoute")} options={EXIT_ROUTES} /></Field>
+          <Field label="Exit EBITDA (€m)"><Inp value={deal.exitEbitda} onChange={u("exitEbitda")} type="number" min={0} /></Field>
+        </div>
+        <Field label="Implied Exit EV (€m)"><Inp value={deal.impliedExitEv} onChange={u("impliedExitEv")} type="number" min={0} /></Field>
+      </div>
+
+      <div style={card}>
+        <SecHeader number="6" label="Management & Sponsor Quality" />
+        <div style={{ background: "#F7F5F1", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "12px 14px", marginBottom: "14px" }}>
+          <div style={{ fontSize: "10px", color: "#888888", marginBottom: "10px" }}>Score each dimension 1–10.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0 16px" }}>
+            {[["Track Record","mgmtTrackRecord"],["Skin in Game","mgmtSkinInGame"],["Sponsor Quality","sponsorQuality"],["Alignment","alignment"]].map(([label, key]) => (
+              <Field key={key} label={label} hint={`${deal[key] ?? "—"} / 10`}>
+                <input type="range" min={1} max={10} step={1} value={deal[key] ?? 5}
+                  onChange={(e) => onUpdate({ ...deal, [key]: parseInt(e.target.value) })}
+                  style={{ width: "100%", accentColor: "#C8692A", cursor: "pointer" }} />
+              </Field>
+            ))}
+          </div>
         </div>
       </div>
 
