@@ -867,7 +867,7 @@ function DealForm({ deal, onUpdate, missingFields = [] }) {
   const flaggedMetrics = { exitMultiple: deal.exitMultiple > 15, exitCagr: deal.exitCagr > 30, netDebtEbitda: deal.netDebtEbitda > 7 };
   const u = (key) => (val) => onUpdate({ ...deal, [key]: val });
 
-  const card = { background: "#ffffff", border: "0.5px solid #E8E5DE", borderRadius: "10px", padding: "20px 20px 6px 20px", marginBottom: "16px" };
+  const card = { background: "#ffffff", border: "0.5px solid #E8E5DE", borderRadius: "10px", padding: "14px 20px 6px 20px", marginBottom: "12px" };
 
   return (
     <div style={{ padding: "0 2px" }}>
@@ -2033,7 +2033,6 @@ function CSVUploadModal({ onClose, onApply, currentDeal, nextId }) {
               <div onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}
                 onClick={() => fileRef.current.click()}
                 style={{ border: "1.5px dashed #D8D4CC", borderRadius: "10px", padding: "32px 20px", textAlign: "center", cursor: "pointer", background: "#F7F5F1", marginBottom: "16px" }}>
-                <div style={{ fontSize: "28px", marginBottom: "8px" }}>📁</div>
                 <div style={{ fontSize: "13px", fontWeight: 500, color: "#0F2744" }}>Drop file here or click to browse</div>
                 <div style={{ fontSize: "11px", color: "#888888", marginTop: "4px" }}>CSV · Required columns match template</div>
                 <input ref={fileRef} type="file" accept=".csv,.xlsx" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
@@ -2195,7 +2194,6 @@ function AIUploadModal({ onClose, onApply, currentDeal, nextId }) {
                       style={{ flex: 1, border: "1.5px solid #E8E5DE", borderRadius: "10px", padding: "16px", cursor: "pointer", textAlign: "center" }}
                       onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#C8692A")}
                       onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#E8E5DE")}>
-                      <div style={{ fontSize: "24px", marginBottom: "8px" }}>📊</div>
                       <div style={{ fontSize: "13px", fontWeight: 600, color: "#0F2744", marginBottom: "4px" }}>CSV / Excel</div>
                       <div style={{ fontSize: "11px", color: "#888888" }}>Any column names — Claude maps to IC Lens fields</div>
                     </div>
@@ -2204,7 +2202,6 @@ function AIUploadModal({ onClose, onApply, currentDeal, nextId }) {
                       style={{ flex: 1, border: "1.5px solid #E8E5DE", borderRadius: "10px", padding: "16px", cursor: "pointer", textAlign: "center" }}
                       onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#C8692A")}
                       onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#E8E5DE")}>
-                      <div style={{ fontSize: "24px", marginBottom: "8px" }}>📄</div>
                       <div style={{ fontSize: "13px", fontWeight: 600, color: "#0F2744", marginBottom: "4px" }}>PDF</div>
                       <div style={{ fontSize: "11px", color: "#888888" }}>CIM, teaser or IC memo — high-confidence fields only</div>
                     </div>
@@ -2226,7 +2223,6 @@ function AIUploadModal({ onClose, onApply, currentDeal, nextId }) {
                     onDragOver={(e) => e.preventDefault()}
                     onClick={() => fileRef.current.click()}
                     style={{ border: "1.5px dashed #D8D4CC", borderRadius: "10px", padding: "32px 20px", textAlign: "center", cursor: "pointer", background: "#F7F5F1", marginBottom: "16px" }}>
-                    <div style={{ fontSize: "28px", marginBottom: "8px" }}>{subMode === "pdf" ? "📄" : "📊"}</div>
                     <div style={{ fontSize: "13px", fontWeight: 500, color: "#0F2744" }}>Drop {subMode.toUpperCase()} here or click to browse</div>
                     <div style={{ fontSize: "11px", color: "#888888", marginTop: "4px" }}>{subMode === "csv" ? "Any column names — Claude will figure out the mapping" : "CIM · Teaser · IC Memo"}</div>
                     <input ref={fileRef} type="file" accept={subMode === "pdf" ? ".pdf" : ".csv,.xlsx"} style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
@@ -2243,8 +2239,7 @@ function AIUploadModal({ onClose, onApply, currentDeal, nextId }) {
           {/* Step: processing */}
           {step === "processing" && (
             <div style={{ textAlign: "center", padding: "32px 0" }}>
-              <div style={{ fontSize: "28px", marginBottom: "16px", animation: "spin 1.5s linear infinite", display: "inline-block" }}>✦</div>
-              <div style={{ fontSize: "14px", fontWeight: 500, color: "#0F2744", marginBottom: "6px" }}>Claude is reading {file?.name}</div>
+              <div style={{ fontSize: "14px", fontWeight: 500, color: "#0F2744", marginBottom: "6px" }}>Processing {file?.name}…</div>
               <div style={{ fontSize: "12px", color: "#888888" }}>{subMode === "pdf" ? "Extracting high-confidence fields from document…" : "Mapping columns to IC Lens schema…"}</div>
               <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
             </div>
