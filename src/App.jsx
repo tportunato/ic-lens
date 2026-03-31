@@ -819,12 +819,13 @@ function ComparisonDashboard({ deals, onBack, onSynthesis }) {
 }
 
 // ─── Shared Form Components (Screen 1) ───────────────────────────────────────
-function Field({ label, children, hint, flag }) {
+function Field({ label, children, hint, flag, missing }) {
   return (
     <div style={{ marginBottom: "14px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-        <label style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.08em", color: "#888888", textTransform: "uppercase" }}>{label}</label>
+        <label style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.08em", color: missing ? "#C8692A" : "#888888", textTransform: "uppercase" }}>{label}</label>
         {flag && <span style={{ fontSize: "9px", background: "#FEECEC", color: "#7a1a1a", padding: "1px 6px", borderRadius: "20px", fontWeight: 500 }}>FLAG</span>}
+        {missing && <span style={{ fontSize: "9px", background: "#FEF5E7", color: "#7a5200", border: "0.5px solid #f0d080", padding: "1px 6px", borderRadius: "20px", fontWeight: 500 }}>MISSING</span>}
       </div>
       {children}
       {hint && <div style={{ fontSize: "10px", color: "#888888", marginTop: "3px" }}>{hint}</div>}
@@ -860,7 +861,8 @@ function SecHeader({ number, label }) {
   );
 }
 
-function DealForm({ deal, onUpdate }) {
+function DealForm({ deal, onUpdate, missingFields = [] }) {
+  const isMissing = (key) => missingFields.includes(key);
   const score = calcScore(deal);
   const flaggedMetrics = { exitMultiple: deal.exitMultiple > 15, exitCagr: deal.exitCagr > 30, netDebtEbitda: deal.netDebtEbitda > 7 };
   const u = (key) => (val) => onUpdate({ ...deal, [key]: val });
@@ -869,10 +871,21 @@ function DealForm({ deal, onUpdate }) {
 
   return (
     <div style={{ padding: "0 2px" }}>
+      {missingFields.length > 0 && (
+        <div style={{ background: "#FEF5E7", border: "0.5px solid #f0d080", borderRadius: "10px", padding: "12px 16px", marginBottom: "16px", display: "flex", alignItems: "flex-start", gap: "10px" }}>
+          <span style={{ fontSize: "14px" }}>⚠</span>
+          <div>
+            <div style={{ fontSize: "12px", fontWeight: 600, color: "#7a5200", marginBottom: "4px" }}>{missingFields.length} field{missingFields.length > 1 ? "s" : ""} could not be extracted — review highlighted fields before running comparison</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+              {missingFields.map(k => <span key={k} style={{ fontSize: "10px", background: "#fff", border: "0.5px solid #f0d080", borderRadius: "20px", padding: "2px 8px", color: "#7a5200", fontWeight: 500 }}>{k}</span>)}
+            </div>
+          </div>
+        </div>
+      )}
       <div style={card}>
         <SecHeader number="A" label="Deal Identity" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
-          <Field label="Deal Name"><Inp value={deal.name} onChange={u("name")} placeholder="e.g. Alpine Consumer Brands" /></Field>
+          <Field label="Deal Name" missing={isMissing("name")}><Inp value={deal.name} onChange={u("name")} placeholder="e.g. Alpine Consumer Brands" /></Field>
           <Field label="Currency"><Sel value={deal.currency} onChange={u("currency")} options={CURRENCIES} /></Field>
           <Field label="Sector"><Sel value={deal.sector} onChange={u("sector")} options={SECTORS} /></Field>
           <Field label="Geography"><Sel value={deal.geography} onChange={u("geography")} options={GEOGRAPHIES} /></Field>
@@ -892,21 +905,21 @@ function DealForm({ deal, onUpdate }) {
       <div style={card}>
         <SecHeader number="1" label="Entry Valuation" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
-          <Field label="Enterprise Value (€m)"><Inp value={deal.ev} onChange={u("ev")} type="number" min={0} /></Field>
-          <Field label="Entry EBITDA (€m)"><Inp value={deal.ebitda} onChange={u("ebitda")} type="number" min={0} step={0.1} /></Field>
-          <Field label="Entry Revenue (€m)"><Inp value={deal.revenue} onChange={u("revenue")} type="number" min={0} step={0.1} /></Field>
-          <Field label="EV/EBITDA (entry)"><Inp value={deal.evEbitda} onChange={u("evEbitda")} type="number" min={0} step={0.1} /></Field>
-          <Field label="EV/Revenue (entry)"><Inp value={deal.evRevenue} onChange={u("evRevenue")} type="number" min={0} step={0.01} /></Field>
-          <Field label="Sector Median EV/EBITDA"><Inp value={deal.sectorMedianEvEbitda} onChange={u("sectorMedianEvEbitda")} type="number" min={0} step={0.1} /></Field>
+          <Field label="Enterprise Value (€m)" missing={isMissing("ev")}><Inp value={deal.ev} onChange={u("ev")} type="number" min={0} /></Field>
+          <Field label="Entry EBITDA (€m)" missing={isMissing("ebitda")}><Inp value={deal.ebitda} onChange={u("ebitda")} type="number" min={0} step={0.1} /></Field>
+          <Field label="Entry Revenue (€m)" missing={isMissing("revenue")}><Inp value={deal.revenue} onChange={u("revenue")} type="number" min={0} step={0.1} /></Field>
+          <Field label="EV/EBITDA (entry)" missing={isMissing("evEbitda")}><Inp value={deal.evEbitda} onChange={u("evEbitda")} type="number" min={0} step={0.1} /></Field>
+          <Field label="EV/Revenue (entry)" missing={isMissing("evRevenue")}><Inp value={deal.evRevenue} onChange={u("evRevenue")} type="number" min={0} step={0.01} /></Field>
+          <Field label="Sector Median EV/EBITDA" missing={isMissing("sectorMedianEvEbitda")}><Inp value={deal.sectorMedianEvEbitda} onChange={u("sectorMedianEvEbitda")} type="number" min={0} step={0.1} /></Field>
         </div>
       </div>
 
       <div style={card}>
         <SecHeader number="2" label="Return Profile" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
-          <Field label="Target IRR (%)"><Inp value={deal.irr} onChange={u("irr")} type="number" min={0} max={100} step={0.1} /></Field>
-          <Field label="MOIC (×)"><Inp value={deal.moic} onChange={u("moic")} type="number" min={0} step={0.1} /></Field>
-          <Field label="Payback Period (yrs)"><Inp value={deal.payback} onChange={u("payback")} type="number" min={0} step={0.1} /></Field>
+          <Field label="Target IRR (%)" missing={isMissing("irr")}><Inp value={deal.irr} onChange={u("irr")} type="number" min={0} max={100} step={0.1} /></Field>
+          <Field label="MOIC (×)" missing={isMissing("moic")}><Inp value={deal.moic} onChange={u("moic")} type="number" min={0} step={0.1} /></Field>
+          <Field label="Payback Period (yrs)" missing={isMissing("payback")}><Inp value={deal.payback} onChange={u("payback")} type="number" min={0} step={0.1} /></Field>
         </div>
         <div style={{ background: "#F7F5F1", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "12px 14px", marginBottom: "14px" }}>
           <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#888888", textTransform: "uppercase", marginBottom: "10px" }}>Return Attribution — MOIC Waterfall (× contribution)</div>
@@ -921,11 +934,11 @@ function DealForm({ deal, onUpdate }) {
       <div style={card}>
         <SecHeader number="3" label="Leverage & Capital Structure" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
-          <Field label="Net Debt (€m)"><Inp value={deal.netDebt} onChange={u("netDebt")} type="number" min={0} /></Field>
+          <Field label="Net Debt (€m)" missing={isMissing("netDebt")}><Inp value={deal.netDebt} onChange={u("netDebt")} type="number" min={0} /></Field>
           <Field label="Net Debt / EBITDA" flag={flaggedMetrics.netDebtEbitda}>
             <Inp value={deal.netDebtEbitda} onChange={u("netDebtEbitda")} type="number" min={0} step={0.1} style={flaggedMetrics.netDebtEbitda ? { borderColor: "#ef4444" } : {}} />
           </Field>
-          <Field label="Interest Coverage (×)"><Inp value={deal.interestCoverage} onChange={u("interestCoverage")} type="number" min={0} step={0.1} /></Field>
+          <Field label="Interest Coverage (×)" missing={isMissing("interestCoverage")}><Inp value={deal.interestCoverage} onChange={u("interestCoverage")} type="number" min={0} step={0.1} /></Field>
           <Field label="Debt Type"><Sel value={deal.debtType} onChange={u("debtType")} options={DEBT_TYPES} /></Field>
           <Field label="Covenant Headroom (%)"><Inp value={deal.covenantProximity} onChange={u("covenantProximity")} type="number" min={0} max={100} /></Field>
           <Field label="Refinancing Risk"><Sel value={deal.refinancingRisk} onChange={u("refinancingRisk")} options={REFINANCING_RISKS} /></Field>
@@ -938,8 +951,8 @@ function DealForm({ deal, onUpdate }) {
           <Field label="Revenue CAGR — Exit (%)" flag={flaggedMetrics.exitCagr}>
             <Inp value={deal.exitCagr} onChange={u("exitCagr")} type="number" min={-20} max={100} step={0.1} style={flaggedMetrics.exitCagr ? { borderColor: "#ef4444" } : {}} />
           </Field>
-          <Field label="EBITDA Margin — Entry (%)"><Inp value={deal.ebitdaMarginEntry} onChange={u("ebitdaMarginEntry")} type="number" min={0} max={100} step={0.1} /></Field>
-          <Field label="EBITDA Margin — Exit (%)"><Inp value={deal.ebitdaMarginExit} onChange={u("ebitdaMarginExit")} type="number" min={0} max={100} step={0.1} /></Field>
+          <Field label="EBITDA Margin — Entry (%)" missing={isMissing("ebitdaMarginEntry")}><Inp value={deal.ebitdaMarginEntry} onChange={u("ebitdaMarginEntry")} type="number" min={0} max={100} step={0.1} /></Field>
+          <Field label="EBITDA Margin — Exit (%)" missing={isMissing("ebitdaMarginExit")}><Inp value={deal.ebitdaMarginExit} onChange={u("ebitdaMarginExit")} type="number" min={0} max={100} step={0.1} /></Field>
           <Field label="Organic Growth Split (%)"><Inp value={deal.organicGrowthSplit} onChange={u("organicGrowthSplit")} type="number" min={0} max={100} step={5} /></Field>
           <Field label="Assumption Score (override)" hint="Auto-calculated if blank">
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
@@ -955,7 +968,7 @@ function DealForm({ deal, onUpdate }) {
       <div style={card}>
         <SecHeader number="5" label="Exit Assumptions" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "0 16px" }}>
-          <Field label="Exit Multiple (×)" flag={flaggedMetrics.exitMultiple}>
+          <Field label="Exit Multiple (×)" missing={isMissing("exitMultiple")} flag={flaggedMetrics.exitMultiple}>
             <Inp value={deal.exitMultiple} onChange={u("exitMultiple")} type="number" min={0} max={50} step={0.5} style={flaggedMetrics.exitMultiple ? { borderColor: "#ef4444" } : {}} />
           </Field>
           <Field label="+1× Sensitivity"><Inp value={deal.exitMultipleSensPlus} onChange={u("exitMultipleSensPlus")} type="number" min={0} step={0.5} /></Field>
@@ -963,7 +976,7 @@ function DealForm({ deal, onUpdate }) {
           <Field label="Exit Route"><Sel value={deal.exitRoute} onChange={u("exitRoute")} options={EXIT_ROUTES} /></Field>
           <Field label="Exit EBITDA (€m)"><Inp value={deal.exitEbitda} onChange={u("exitEbitda")} type="number" min={0} /></Field>
         </div>
-        <Field label="Implied Exit EV (€m)"><Inp value={deal.impliedExitEv} onChange={u("impliedExitEv")} type="number" min={0} /></Field>
+        <Field label="Implied Exit EV (€m)" missing={isMissing("impliedExitEv")}><Inp value={deal.impliedExitEv} onChange={u("impliedExitEv")} type="number" min={0} /></Field>
       </div>
 
       <div style={card}>
@@ -1916,6 +1929,390 @@ function SynthesisPanel({ deals, strategy, onBack }) {
   );
 }
 
+
+// ─── CSV Template ─────────────────────────────────────────────────────────────
+const CSV_TEMPLATE_HEADERS = [
+  "name","sector","geography","currency","vintage","holdingPeriod",
+  "ev","ebitda","revenue","evEbitda","evRevenue","sectorMedianEvEbitda",
+  "irr","moic","payback",
+  "attr_entryPrice","attr_revenueGrowth","attr_marginExpansion","attr_multipleExpansion","attr_leveragePaydown",
+  "netDebt","netDebtEbitda","interestCoverage","debtType","covenantProximity","refinancingRisk",
+  "exitCagr","ebitdaMarginEntry","ebitdaMarginExit","organicGrowthSplit","assumptionScore",
+  "exitMultiple","exitMultipleSensPlus","exitMultipleSensMinus","exitRoute","exitEbitda","impliedExitEv",
+  "mgmtTrackRecord","mgmtSkinInGame","sponsorQuality","alignment","notes","fragility"
+];
+
+function downloadTemplate() {
+  const row = CSV_TEMPLATE_HEADERS.join(",");
+  const blob = new Blob([row + "\n"], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "ic-lens-template.csv"; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split("\n");
+  if (lines.length < 2) return null;
+  const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
+  const values = lines[1].split(",").map(v => v.trim().replace(/^"|"$/g, ""));
+  const row = {};
+  headers.forEach((h, i) => { row[h] = values[i] ?? ""; });
+  return row;
+}
+
+function csvRowToDeal(row, id) {
+  const numFields = ["ev","ebitda","revenue","evEbitda","evRevenue","sectorMedianEvEbitda",
+    "irr","moic","payback","attr_entryPrice","attr_revenueGrowth","attr_marginExpansion",
+    "attr_multipleExpansion","attr_leveragePaydown","netDebt","netDebtEbitda","interestCoverage",
+    "covenantProximity","exitCagr","ebitdaMarginEntry","ebitdaMarginExit","organicGrowthSplit",
+    "assumptionScore","exitMultiple","exitMultipleSensPlus","exitMultipleSensMinus",
+    "exitEbitda","impliedExitEv","mgmtTrackRecord","mgmtSkinInGame","sponsorQuality","alignment","holdingPeriod","vintage"];
+  const deal = { id, entryCagr: 0 };
+  const missing = [];
+  CSV_TEMPLATE_HEADERS.forEach(key => {
+    const val = row[key];
+    if (val === undefined || val === "") {
+      deal[key] = "";
+      if (["name","ev","ebitda","irr","moic"].includes(key)) missing.push(key);
+    } else {
+      deal[key] = numFields.includes(key) ? parseFloat(val) || val : val;
+    }
+  });
+  return { deal, missing };
+}
+
+// ─── CSV Upload Modal ─────────────────────────────────────────────────────────
+function CSVUploadModal({ onClose, onApply, currentDeal, nextId }) {
+  const [file, setFile] = useState(null);
+  const [parsed, setParsed] = useState(null);
+  const [missing, setMissing] = useState([]);
+  const [error, setError] = useState("");
+  const [step, setStep] = useState("upload"); // upload | confirm
+  const [applyMode, setApplyMode] = useState("current");
+  const fileRef = useRef();
+
+  function handleFile(f) {
+    if (!f) return;
+    setFile(f); setError("");
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const row = parseCSV(e.target.result);
+      if (!row) { setError("Could not parse file. Ensure it matches the template format."); return; }
+      const id = applyMode === "new" ? nextId : (currentDeal?.id ?? nextId);
+      const { deal, missing: m } = csvRowToDeal(row, id);
+      setParsed(deal); setMissing(m); setStep("confirm");
+    };
+    reader.readAsText(f);
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  }
+
+  const overlay = { position: "fixed", inset: 0, background: "rgba(15,39,68,0.55)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" };
+  const modal = { background: "#fff", borderRadius: "12px", width: "480px", boxShadow: "0 8px 32px rgba(15,39,68,0.18)", overflow: "hidden", fontFamily: "'DM Sans', sans-serif" };
+
+  return (
+    <div style={overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div style={modal}>
+        {/* Header */}
+        <div style={{ background: "#0F2744", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: "14px", fontWeight: 600, color: "#fff" }}>Upload Deal Data</div>
+            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.55)", marginTop: "2px" }}>CSV must match IC Lens template format exactly</div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: "18px", cursor: "pointer", lineHeight: 1 }}>×</button>
+        </div>
+
+        <div style={{ padding: "20px" }}>
+          {step === "upload" && (
+            <>
+              {/* Drop zone */}
+              <div onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}
+                onClick={() => fileRef.current.click()}
+                style={{ border: "1.5px dashed #D8D4CC", borderRadius: "10px", padding: "32px 20px", textAlign: "center", cursor: "pointer", background: "#F7F5F1", marginBottom: "16px" }}>
+                <div style={{ fontSize: "28px", marginBottom: "8px" }}>📁</div>
+                <div style={{ fontSize: "13px", fontWeight: 500, color: "#0F2744" }}>Drop file here or click to browse</div>
+                <div style={{ fontSize: "11px", color: "#888888", marginTop: "4px" }}>CSV · Required columns match template</div>
+                <input ref={fileRef} type="file" accept=".csv,.xlsx" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
+              </div>
+              {error && <div style={{ fontSize: "11px", color: "#ef4444", marginBottom: "12px" }}>{error}</div>}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <button onClick={downloadTemplate} style={{ fontSize: "12px", color: "#C8692A", background: "none", border: "1px solid #C8692A", borderRadius: "8px", padding: "7px 14px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                  ↓ Download Template
+                </button>
+                <button onClick={onClose} style={{ fontSize: "12px", color: "#888888", background: "none", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "7px 14px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
+
+          {step === "confirm" && parsed && (
+            <>
+              {/* Missing fields warning */}
+              {missing.length > 0 && (
+                <div style={{ background: "#FEF5E7", border: "0.5px solid #f0d080", borderRadius: "8px", padding: "10px 14px", marginBottom: "14px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, color: "#7a5200", marginBottom: "4px" }}>⚠ {missing.length} required field{missing.length > 1 ? "s" : ""} missing — review before running comparison</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                    {missing.map(k => <span key={k} style={{ fontSize: "10px", background: "#fff", border: "0.5px solid #f0d080", borderRadius: "20px", padding: "2px 8px", color: "#7a5200" }}>{k}</span>)}
+                  </div>
+                </div>
+              )}
+
+              {/* Deal name preview */}
+              <div style={{ background: "#F7F5F1", borderRadius: "8px", padding: "10px 14px", marginBottom: "16px" }}>
+                <div style={{ fontSize: "10px", color: "#888888", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>Deal detected</div>
+                <div style={{ fontSize: "14px", fontWeight: 500, color: "#0F2744" }}>{parsed.name || "Unnamed Deal"}</div>
+                <div style={{ fontSize: "11px", color: "#888888", marginTop: "2px" }}>{parsed.sector} · {parsed.geography} · {parsed.currency}</div>
+              </div>
+
+              {/* Apply mode */}
+              <div style={{ marginBottom: "20px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#555555", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.07em" }}>Apply to</div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  {[["current", `Current deal${currentDeal?.name ? " — " + currentDeal.name : ""}`], ["new", "Create new deal tab"]].map(([val, label]) => (
+                    <div key={val} onClick={() => setApplyMode(val)}
+                      style={{ flex: 1, padding: "10px 12px", borderRadius: "8px", border: `1.5px solid ${applyMode === val ? "#C8692A" : "#E8E5DE"}`, background: applyMode === val ? "#FBF0E9" : "#fff", cursor: "pointer", textAlign: "center" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 500, color: applyMode === val ? "#7A3A12" : "#555555" }}>{label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                <button onClick={() => setStep("upload")} style={{ fontSize: "12px", color: "#888888", background: "none", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "8px 16px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Back</button>
+                <button onClick={() => onApply(parsed, applyMode, missing)}
+                  style={{ fontSize: "13px", fontWeight: 500, color: "#fff", background: "#C8692A", border: "none", borderRadius: "8px", padding: "8px 20px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                  Apply Data →
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── AI Upload Modal ──────────────────────────────────────────────────────────
+// Demo mode: pre-mapped extraction results for CIM/CSV
+const DEMO_AI_EXTRACTION = {
+  csv: {
+    deal: {
+      name: "Luxe Retail Group", sector: "Consumer & Retail", geography: "Western Europe",
+      currency: "EUR", vintage: "2024", holdingPeriod: 5,
+      ev: 310, ebitda: 38, revenue: 142, evEbitda: 8.2, evRevenue: 2.18, sectorMedianEvEbitda: 9.5,
+      irr: 21.5, moic: 2.7, payback: 4.8,
+      attr_entryPrice: 0.22, attr_revenueGrowth: 0.55, attr_marginExpansion: 0.28, attr_multipleExpansion: 0.31, attr_leveragePaydown: 0.34,
+      netDebt: 155, netDebtEbitda: 4.1, interestCoverage: 3.5,
+      debtType: "Senior Secured", covenantProximity: 20, refinancingRisk: "Low",
+      entryCagr: 0, exitCagr: 9.2, ebitdaMarginEntry: 26.8, ebitdaMarginExit: 31.0,
+      organicGrowthSplit: 70, assumptionScore: "",
+      exitMultiple: 10.0, exitRoute: "Trade Sale", exitEbitda: 72, impliedExitEv: 720,
+      exitMultipleSensPlus: 11.0, exitMultipleSensMinus: 9.0,
+      mgmtTrackRecord: 7, mgmtSkinInGame: "", sponsorQuality: 8, alignment: "",
+      notes: "Premium retail consolidation play. Omnichannel pivot underway.", fragility: "Revenue CAGR",
+    },
+    missing: ["mgmtSkinInGame", "alignment", "assumptionScore"],
+    mapped: { "Enterprise Value": "ev", "EBITDA": "ebitda", "Revenue": "revenue", "IRR Target": "irr", "MOIC": "moic" },
+  },
+  pdf: {
+    deal: {
+      name: "Castellan Infrastructure Partners", sector: "Energy & Infrastructure", geography: "Western Europe",
+      currency: "EUR", vintage: "2024", holdingPeriod: "",
+      ev: 890, ebitda: "", revenue: "", evEbitda: "", evRevenue: "", sectorMedianEvEbitda: "",
+      irr: 18.5, moic: 2.4, payback: "",
+      attr_entryPrice: "", attr_revenueGrowth: "", attr_marginExpansion: "", attr_multipleExpansion: "", attr_leveragePaydown: "",
+      netDebt: 445, netDebtEbitda: "", interestCoverage: "",
+      debtType: "Senior Secured", covenantProximity: "", refinancingRisk: "Medium",
+      entryCagr: 0, exitCagr: "", ebitdaMarginEntry: "", ebitdaMarginExit: "",
+      organicGrowthSplit: "", assumptionScore: "",
+      exitMultiple: "", exitRoute: "Secondary Buyout", exitEbitda: "", impliedExitEv: "",
+      exitMultipleSensPlus: "", exitMultipleSensMinus: "",
+      mgmtTrackRecord: "", mgmtSkinInGame: "", sponsorQuality: "", alignment: "",
+      notes: "Infrastructure roll-up. Regulated asset base. CIM extracted partial data — review all flagged fields.", fragility: "",
+    },
+    missing: ["holdingPeriod","ebitda","revenue","evEbitda","evRevenue","sectorMedianEvEbitda","payback",
+      "attr_entryPrice","attr_revenueGrowth","attr_marginExpansion","attr_multipleExpansion","attr_leveragePaydown",
+      "netDebtEbitda","interestCoverage","covenantProximity","exitCagr","ebitdaMarginEntry","ebitdaMarginExit",
+      "organicGrowthSplit","assumptionScore","exitMultiple","exitEbitda","impliedExitEv","exitMultipleSensPlus",
+      "exitMultipleSensMinus","mgmtTrackRecord","mgmtSkinInGame","sponsorQuality","alignment","fragility"],
+  },
+};
+
+function AIUploadModal({ onClose, onApply, currentDeal, nextId }) {
+  const [subMode, setSubMode] = useState(null); // null | "csv" | "pdf"
+  const [file, setFile] = useState(null);
+  const [step, setStep] = useState("pick"); // pick | processing | confirm
+  const [result, setResult] = useState(null);
+  const [applyMode, setApplyMode] = useState("current");
+  const fileRef = useRef();
+
+  function handleFile(f) {
+    if (!f) return;
+    setFile(f); setStep("processing");
+    // Demo: simulate AI processing delay
+    setTimeout(() => {
+      const demo = DEMO_AI_EXTRACTION[subMode];
+      const id = applyMode === "new" ? nextId : (currentDeal?.id ?? nextId);
+      setResult({ ...demo, deal: { ...demo.deal, id } });
+      setStep("confirm");
+    }, 2200);
+  }
+
+  const overlay = { position: "fixed", inset: 0, background: "rgba(15,39,68,0.55)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" };
+  const modal = { background: "#fff", borderRadius: "12px", width: "520px", boxShadow: "0 8px 32px rgba(15,39,68,0.18)", overflow: "hidden", fontFamily: "'DM Sans', sans-serif" };
+
+  return (
+    <div style={overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div style={modal}>
+        {/* Header */}
+        <div style={{ background: "#0F2744", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "#fff" }}>✦ AI Upload</span>
+              <span style={{ fontSize: "9px", background: "#C8692A", color: "#fff", padding: "2px 7px", borderRadius: "20px", fontWeight: 600, letterSpacing: "0.06em" }}>DEMO</span>
+            </div>
+            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.55)", marginTop: "2px" }}>Claude maps your file to IC Lens deal fields automatically</div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: "18px", cursor: "pointer", lineHeight: 1 }}>×</button>
+        </div>
+
+        <div style={{ padding: "20px" }}>
+
+          {/* Step: pick mode */}
+          {step === "pick" && (
+            <>
+              {!subMode && (
+                <>
+                  <div style={{ fontSize: "12px", color: "#555555", marginBottom: "16px" }}>Choose your source format:</div>
+                  <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+                    {/* CSV option */}
+                    <div onClick={() => setSubMode("csv")}
+                      style={{ flex: 1, border: "1.5px solid #E8E5DE", borderRadius: "10px", padding: "16px", cursor: "pointer", textAlign: "center" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#C8692A")}
+                      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#E8E5DE")}>
+                      <div style={{ fontSize: "24px", marginBottom: "8px" }}>📊</div>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#0F2744", marginBottom: "4px" }}>CSV / Excel</div>
+                      <div style={{ fontSize: "11px", color: "#888888" }}>Any column names — Claude maps to IC Lens fields</div>
+                    </div>
+                    {/* PDF option */}
+                    <div onClick={() => setSubMode("pdf")}
+                      style={{ flex: 1, border: "1.5px solid #E8E5DE", borderRadius: "10px", padding: "16px", cursor: "pointer", textAlign: "center" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#C8692A")}
+                      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#E8E5DE")}>
+                      <div style={{ fontSize: "24px", marginBottom: "8px" }}>📄</div>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#0F2744", marginBottom: "4px" }}>PDF</div>
+                      <div style={{ fontSize: "11px", color: "#888888" }}>CIM, teaser or IC memo — high-confidence fields only</div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <button onClick={onClose} style={{ fontSize: "12px", color: "#888888", background: "none", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "7px 14px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Cancel</button>
+                  </div>
+                </>
+              )}
+
+              {subMode && (
+                <>
+                  {subMode === "pdf" && (
+                    <div style={{ background: "#FEF5E7", border: "0.5px solid #f0d080", borderRadius: "8px", padding: "10px 14px", marginBottom: "14px", fontSize: "11px", color: "#7a5200" }}>
+                      ⚠ PDF extraction is more token-intensive and less precise than CSV upload. Missing or low-confidence fields will be flagged for manual review.
+                    </div>
+                  )}
+                  <div onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onClick={() => fileRef.current.click()}
+                    style={{ border: "1.5px dashed #D8D4CC", borderRadius: "10px", padding: "32px 20px", textAlign: "center", cursor: "pointer", background: "#F7F5F1", marginBottom: "16px" }}>
+                    <div style={{ fontSize: "28px", marginBottom: "8px" }}>{subMode === "pdf" ? "📄" : "📊"}</div>
+                    <div style={{ fontSize: "13px", fontWeight: 500, color: "#0F2744" }}>Drop {subMode.toUpperCase()} here or click to browse</div>
+                    <div style={{ fontSize: "11px", color: "#888888", marginTop: "4px" }}>{subMode === "csv" ? "Any column names — Claude will figure out the mapping" : "CIM · Teaser · IC Memo"}</div>
+                    <input ref={fileRef} type="file" accept={subMode === "pdf" ? ".pdf" : ".csv,.xlsx"} style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <button onClick={() => setSubMode(null)} style={{ fontSize: "12px", color: "#888888", background: "none", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "7px 14px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Back</button>
+                    <button onClick={onClose} style={{ fontSize: "12px", color: "#888888", background: "none", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "7px 14px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Cancel</button>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {/* Step: processing */}
+          {step === "processing" && (
+            <div style={{ textAlign: "center", padding: "32px 0" }}>
+              <div style={{ fontSize: "28px", marginBottom: "16px", animation: "spin 1.5s linear infinite", display: "inline-block" }}>✦</div>
+              <div style={{ fontSize: "14px", fontWeight: 500, color: "#0F2744", marginBottom: "6px" }}>Claude is reading {file?.name}</div>
+              <div style={{ fontSize: "12px", color: "#888888" }}>{subMode === "pdf" ? "Extracting high-confidence fields from document…" : "Mapping columns to IC Lens schema…"}</div>
+              <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+            </div>
+          )}
+
+          {/* Step: confirm */}
+          {step === "confirm" && result && (
+            <>
+              {/* Mapped columns (CSV only) */}
+              {subMode === "csv" && result.mapped && (
+                <div style={{ background: "#E8F5EE", border: "0.5px solid #a8d5b8", borderRadius: "8px", padding: "10px 14px", marginBottom: "12px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, color: "#1a6b3a", marginBottom: "6px" }}>✓ Column mapping complete</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                    {Object.entries(result.mapped).map(([from, to]) => (
+                      <span key={from} style={{ fontSize: "10px", background: "#fff", border: "0.5px solid #a8d5b8", borderRadius: "20px", padding: "2px 8px", color: "#1a6b3a" }}>
+                        {from} → <strong>{to}</strong>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Missing fields */}
+              {result.missing.length > 0 && (
+                <div style={{ background: "#FEF5E7", border: "0.5px solid #f0d080", borderRadius: "8px", padding: "10px 14px", marginBottom: "12px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, color: "#7a5200", marginBottom: "4px" }}>⚠ {result.missing.length} field{result.missing.length > 1 ? "s" : ""} could not be extracted — review before running comparison</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                    {result.missing.map(k => <span key={k} style={{ fontSize: "10px", background: "#fff", border: "0.5px solid #f0d080", borderRadius: "20px", padding: "2px 8px", color: "#7a5200" }}>{k}</span>)}
+                  </div>
+                </div>
+              )}
+
+              {/* Deal preview */}
+              <div style={{ background: "#F7F5F1", borderRadius: "8px", padding: "10px 14px", marginBottom: "16px" }}>
+                <div style={{ fontSize: "10px", color: "#888888", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>Deal extracted</div>
+                <div style={{ fontSize: "14px", fontWeight: 500, color: "#0F2744" }}>{result.deal.name || "Unnamed Deal"}</div>
+                <div style={{ fontSize: "11px", color: "#888888", marginTop: "2px" }}>{result.deal.sector} · {result.deal.geography} · {result.deal.currency}</div>
+              </div>
+
+              {/* Apply mode */}
+              <div style={{ marginBottom: "20px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#555555", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.07em" }}>Apply to</div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  {[["current", `Current deal${currentDeal?.name ? " — " + currentDeal.name : ""}`], ["new", "Create new deal tab"]].map(([val, label]) => (
+                    <div key={val} onClick={() => setApplyMode(val)}
+                      style={{ flex: 1, padding: "10px 12px", borderRadius: "8px", border: `1.5px solid ${applyMode === val ? "#C8692A" : "#E8E5DE"}`, background: applyMode === val ? "#FBF0E9" : "#fff", cursor: "pointer", textAlign: "center" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 500, color: applyMode === val ? "#7A3A12" : "#555555" }}>{label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                <button onClick={() => { setStep("pick"); setResult(null); setFile(null); setSubMode(null); }}
+                  style={{ fontSize: "12px", color: "#888888", background: "none", border: "0.5px solid #E8E5DE", borderRadius: "8px", padding: "8px 16px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Back</button>
+                <button onClick={() => onApply(result.deal, applyMode, result.missing)}
+                  style={{ fontSize: "13px", fontWeight: 500, color: "#fff", background: "#C8692A", border: "none", borderRadius: "8px", padding: "8px 20px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                  Apply Data →
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main App ────────────────────────────────────────────────────────────────
 export default function ICLens() {
   const [screen, setScreen] = useState(1);
@@ -1934,6 +2331,9 @@ export default function ICLens() {
     maxAssumeScore: 7.5,
     notes: "Mid-market European buyout fund targeting €150m–€800m EV transactions. Bias toward asset-light business models with defensible market positions. Avoid highly cyclical or single-product companies. ESG screening applied at entry.",
   });
+  const [showCSVModal, setShowCSVModal] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [missingFields, setMissingFields] = useState({});
   const nextId = Math.max(...deals.map(d => d.id)) + 1;
   const activeDeal = deals.find(d => d.id === activeDealId);
 
@@ -1956,6 +2356,22 @@ export default function ICLens() {
     const remaining = deals.filter(d => d.id !== id);
     setDeals(remaining);
     if (activeDealId === id) setActiveDealId(remaining[0]?.id);
+  }
+  function applyUpload(deal, mode, missing) {
+    if (mode === "new") {
+      const id = nextId;
+      const newDeal = { ...deal, id };
+      setDeals(prev => [...prev, newDeal]);
+      setActiveDealId(id);
+      setMissingFields(prev => ({ ...prev, [id]: missing }));
+    } else {
+      const id = activeDealId;
+      const merged = { ...activeDeal, ...deal, id };
+      setDeals(prev => prev.map(d => d.id === id ? merged : d));
+      setMissingFields(prev => ({ ...prev, [id]: missing }));
+    }
+    setShowCSVModal(false);
+    setShowAIModal(false);
   }
 
   return (
@@ -2016,6 +2432,26 @@ export default function ICLens() {
               <div style={{ fontSize: "12px", color: "#888888", marginTop: "2px" }}>Enter metrics across all six analytical dimensions. Pre-populated with 3 sample deals.</div>
             </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <button onClick={() => setShowCSVModal(true)} style={{
+              padding: "8px 14px", background: "#fff", color: "#0F2744",
+              border: "1px solid #E8E5DE", borderRadius: "8px", fontSize: "12px", fontWeight: 500,
+              cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+            }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#F7F5F1")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+            >
+              ↑ Upload CSV
+            </button>
+            <button onClick={() => setShowAIModal(true)} style={{
+              padding: "8px 14px", background: "#fff", color: "#C8692A",
+              border: "1.5px solid #C8692A", borderRadius: "8px", fontSize: "12px", fontWeight: 500,
+              cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+            }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#FBF0E9")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+            >
+              ✦ AI Upload
+            </button>
             <button onClick={() => setScreen(2)} style={{
               padding: "9px 18px", background: "#C8692A", color: "#fff",
               border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500,
@@ -2031,7 +2467,7 @@ export default function ICLens() {
           <DealTabs deals={deals} activeDeal={activeDealId} onSelect={setActiveDealId} onAdd={addDeal} onRemove={removeDeal} />
           <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
             <div style={{ flex: 1, overflowY: "auto", padding: "24px 32px" }}>
-              {activeDeal && <DealForm deal={activeDeal} onUpdate={updateDeal} />}
+              {activeDeal && <DealForm deal={activeDeal} onUpdate={updateDeal} missingFields={missingFields[activeDeal?.id] || []} />}
             </div>
             {/* Right sidebar */}
             <div style={{ width: "260px", flexShrink: 0, background: "#ffffff", borderLeft: "0.5px solid #E8E5DE", overflowY: "auto", padding: "18px 16px" }}>
@@ -2060,6 +2496,10 @@ export default function ICLens() {
             </div>
           </div>
         </div>
+
+        {/* Upload Modals */}
+        {showCSVModal && <CSVUploadModal onClose={() => setShowCSVModal(false)} onApply={applyUpload} currentDeal={activeDeal} nextId={nextId} />}
+        {showAIModal && <AIUploadModal onClose={() => setShowAIModal(false)} onApply={applyUpload} currentDeal={activeDeal} nextId={nextId} />}
       )}
 
       {/* Screen 2 — Comparison Dashboard */}
