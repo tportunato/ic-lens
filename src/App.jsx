@@ -2496,11 +2496,11 @@ export default function ICLens() {
             </div>
           </div>
         </div>
+      )}
 
         {/* Upload Modals */}
         {showCSVModal && <CSVUploadModal onClose={() => setShowCSVModal(false)} onApply={applyUpload} currentDeal={activeDeal} nextId={nextId} />}
         {showAIModal && <AIUploadModal onClose={() => setShowAIModal(false)} onApply={applyUpload} currentDeal={activeDeal} nextId={nextId} />}
-      )}
 
       {/* Screen 2 — Comparison Dashboard */}
       {screen === 2 && (
