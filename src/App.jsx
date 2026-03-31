@@ -821,7 +821,7 @@ function ComparisonDashboard({ deals, onBack, onSynthesis }) {
 // ─── Shared Form Components (Screen 1) ───────────────────────────────────────
 function Field({ label, children, hint, flag, missing }) {
   return (
-    <div style={{ marginBottom: "14px" }}>
+    <div style={{ marginBottom: "10px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
         <label style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.08em", color: missing ? "#C8692A" : "#888888", textTransform: "uppercase" }}>{label}</label>
         {flag && <span style={{ fontSize: "9px", background: "#FEECEC", color: "#7a1a1a", padding: "1px 6px", borderRadius: "20px", fontWeight: 500 }}>FLAG</span>}
@@ -854,7 +854,7 @@ function Sel({ value, onChange, options }) {
 
 function SecHeader({ number, label }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", borderBottom: "0.5px solid #E8E5DE", paddingBottom: "8px", marginBottom: "16px", marginTop: "24px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", borderBottom: "0.5px solid #E8E5DE", paddingBottom: "6px", marginBottom: "12px", marginTop: "0" }}>
       <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#0F2744", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 600, flexShrink: 0 }}>{number}</div>
       <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.09em", color: "#888888", textTransform: "uppercase" }}>{label}</span>
     </div>
@@ -867,7 +867,7 @@ function DealForm({ deal, onUpdate, missingFields = [] }) {
   const flaggedMetrics = { exitMultiple: deal.exitMultiple > 15, exitCagr: deal.exitCagr > 30, netDebtEbitda: deal.netDebtEbitda > 7 };
   const u = (key) => (val) => onUpdate({ ...deal, [key]: val });
 
-  const card = { background: "#ffffff", border: "0.5px solid #E8E5DE", borderRadius: "10px", padding: "14px 20px 6px 20px", marginBottom: "12px" };
+  const card = { background: "#ffffff", border: "0.5px solid #E8E5DE", borderRadius: "10px", padding: "12px 20px 6px 20px", marginBottom: "10px" };
 
   return (
     <div style={{ padding: "0 2px" }}>
@@ -2479,7 +2479,7 @@ export default function ICLens() {
                   </div>
                 </div>
               )}
-              <div style={{ marginBottom: "14px" }}>
+              <div style={{ marginBottom: "10px" }}>
                 <div style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.09em", textTransform: "uppercase", color: "#888888", marginBottom: "8px" }}>All Deals</div>
                 {deals.map((d, i) => (
                   <div key={d.id} onClick={() => setActiveDealId(d.id)} style={{ padding: "8px 10px", marginBottom: "5px", background: activeDealId === d.id ? "#FBF0E9" : "#F7F5F1", border: `0.5px solid ${activeDealId === d.id ? "#C8692A40" : "#E8E5DE"}`, borderLeft: `3px solid ${DEAL_COLORS[i]}`, borderRadius: "8px", cursor: "pointer" }}>
