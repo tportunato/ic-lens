@@ -2308,9 +2308,127 @@ function AIUploadModal({ onClose, onApply, currentDeal, nextId }) {
   );
 }
 
+
+// ─── Landing Screen ───────────────────────────────────────────────────────────
+function LandingScreen({ onStart }) {
+  const steps = [
+    { num: "01", label: "Deal Intake", ai: true, desc: "Enter metrics across six dimensions for up to five deals. Upload a CSV or PDF — Claude maps fields to the schema automatically." },
+    { num: "02", label: "Comparison", ai: false, desc: "Side-by-side heatmap with mandate fit scoring and return attribution." },
+    { num: "03", label: "AI Synthesis", ai: true, desc: "Claude generates a structured IC memo with deal-level recommendations." },
+  ];
+
+  const features = [
+    { label: "Return attribution", desc: "MOIC waterfall decomposed across five value creation drivers per deal" },
+    { label: "Assumption scoring", desc: "Aggressiveness score from CAGR, margin expansion and exit multiple" },
+    { label: "Mandate fit", desc: "Deals scored against your IRR floor, leverage ceiling and sector filters" },
+    { label: "AI Upload", desc: "Upload a CIM or deal model — Claude maps fields to the IC Lens schema automatically" },
+  ];
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#ffffff", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');`}</style>
+
+      {/* Nav */}
+      <header style={{ background: "#0F2744", height: "56px", padding: "0 48px", display: "flex", alignItems: "center", flexShrink: 0, position: "sticky", top: 0, zIndex: 100 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <img src="https://res.cloudinary.com/dsgfts9gp/image/upload/Gemini_Generated_Image_uao02uao02uao02u-remove-bg-io_mb5sys.png" alt="" style={{ height: "34px", width: "34px", objectFit: "contain" }} />
+          <div style={{ width: "0.5px", height: "16px", background: "rgba(255,255,255,0.15)" }} />
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "#ffffff" }}>IC Lens</span>
+          <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#C8692A" }} />
+          <span style={{ fontSize: "9px", fontWeight: 600, letterSpacing: "0.09em", color: "rgba(255,255,255,0.3)", textTransform: "uppercase" }}>PE Deal Intelligence</span>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <div style={{ background: "#0F2744", padding: "100px 48px 110px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "28px" }}>
+          Investment Committee Tool
+        </div>
+        <h1 style={{ fontSize: "40px", fontWeight: 600, color: "#ffffff", margin: "0 0 20px", letterSpacing: "-0.025em", lineHeight: 1.15, maxWidth: "600px" }}>
+          Deal analysis built<br />for the IC table.
+        </h1>
+        <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.5)", margin: "0 0 48px", maxWidth: "440px", lineHeight: 1.7, fontWeight: 400 }}>
+          Compare up to five buyout deals across six analytical dimensions — with mandate fit scoring, return attribution, and AI-generated synthesis.
+        </p>
+        <button
+          onClick={onStart}
+          style={{ padding: "12px 28px", background: "#C8692A", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer", letterSpacing: "0.01em" }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#A85520")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#C8692A")}
+        >
+          Get Started →
+        </button>
+        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.2)", marginTop: "14px" }}>Pre-populated with 3 sample deals</div>
+      </div>
+
+      {/* Three steps */}
+      <div style={{ background: "#ffffff", padding: "80px 48px" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+          <div style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.1em", color: "#aaaaaa", textTransform: "uppercase", marginBottom: "48px", textAlign: "center" }}>Three steps</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 48px" }}>
+            {steps.map((s) => (
+              <div key={s.num}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                  <span style={{ fontSize: "11px", fontWeight: 500, color: "#C8692A", fontFamily: "monospace" }}>{s.num}</span>
+                  {s.ai && <span style={{ fontSize: "9px", fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "#7A3A12", background: "#FBF0E9", padding: "2px 7px", borderRadius: "20px" }}>AI</span>}
+                </div>
+                <div style={{ borderTop: "0.5px solid #E8E5DE", paddingTop: "20px" }}>
+                  <div style={{ fontSize: "15px", fontWeight: 500, color: "#0F2744", marginBottom: "10px" }}>{s.label}</div>
+                  <div style={{ fontSize: "13px", color: "#888888", lineHeight: 1.65 }}>{s.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div style={{ background: "#F7F5F1", padding: "64px 48px" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+          <div style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.1em", color: "#aaaaaa", textTransform: "uppercase", marginBottom: "40px", textAlign: "center" }}>What's inside</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px 64px" }}>
+            {features.map((f) => (
+              <div key={f.label} style={{ borderTop: "0.5px solid #E8E5DE", paddingTop: "20px" }}>
+                <div style={{ fontSize: "13px", fontWeight: 500, color: "#0F2744", marginBottom: "6px" }}>{f.label}</div>
+                <div style={{ fontSize: "13px", color: "#888888", lineHeight: 1.6 }}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* AI strip */}
+      <div style={{ background: "#0F2744", padding: "48px" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "flex-start", gap: "80px" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.1em", color: "#C8692A", textTransform: "uppercase", marginBottom: "16px" }}>AI features</div>
+            <div style={{ fontSize: "15px", fontWeight: 500, color: "#ffffff", marginBottom: "12px", lineHeight: 1.4 }}>Claude acts as an additional analyst in your IC process</div>
+            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.7 }}>
+              Synthesis, assumption scoring, mandate fit, and upload mapping — all pre-computed in demo mode. No data is transmitted externally.
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px", paddingTop: "38px", flexShrink: 0 }}>
+            {["IC memo generation", "Assumption scoring", "Cross-deal ranking", "AI Upload — CSV & PDF"].map(f => (
+              <div key={f} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#C8692A" }} />
+                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>{f}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ background: "#ffffff", padding: "24px 48px", borderTop: "0.5px solid #E8E5DE" }}>
+        <div style={{ fontSize: "11px", color: "#cccccc", textAlign: "center" }}>IC Lens · PE Deal Intelligence · Built by Tomaso Portunato</div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main App ────────────────────────────────────────────────────────────────
 export default function ICLens() {
-  const [screen, setScreen] = useState(1);
+  const [screen, setScreen] = useState(0);
   const [deals, setDeals] = useState(SAMPLE_DEALS.map(d => ({ ...d })));
   const [activeDealId, setActiveDealId] = useState(SAMPLE_DEALS[0].id);
   const [strategy, setStrategy] = useState({
@@ -2368,6 +2486,8 @@ export default function ICLens() {
     setShowCSVModal(false);
     setShowAIModal(false);
   }
+
+  if (screen === 0) return <LandingScreen onStart={() => setScreen(1)} />;
 
   return (
     <div style={{ minHeight: "100vh", background: "#F7F5F1", fontFamily: "'DM Sans', sans-serif" }}>
